@@ -1,0 +1,28 @@
+services:
+  laravel-docker:
+    container_name: apiArtisanVillage
+    build: ./
+    ports:
+      - 8000:80
+    volumes: 
+      - ./:/var/www/html
+    working_dir: /var/www/html
+
+  artisanvillage_db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: artisanvillagedocker
+    env_file:
+      - ./docker/.env
+    ports:
+      - 3306:3306
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    ports:
+      - 9001:80
+    environment:
+      PMA_HOST: artisanvillage_db
+    env_file:
+      - ./docker/.env
