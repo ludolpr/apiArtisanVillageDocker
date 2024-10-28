@@ -1,5 +1,5 @@
 name: CI-Artisan-village
-
+# note for sending CI
 on:
   push:
     branches:
