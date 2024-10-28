@@ -39,7 +39,7 @@ class CompanyControllerTest extends TestCase
         $this->assertCount(5, $response->json());
     }
     
-
+    
 
     public function test_Company_Store()
     {
