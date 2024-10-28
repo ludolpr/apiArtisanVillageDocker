@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('product_tag', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('product_id');
-            $table->bigInteger('tag_id');
+            $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('tag_id');
             $table->foreign('product_id')
                 ->references('id')
                 ->on('products')

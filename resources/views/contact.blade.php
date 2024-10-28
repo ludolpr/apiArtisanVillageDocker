@@ -65,9 +65,9 @@
         <p>{{ $details['message'] }}</p>
         <br>
 
-        <p class="footer">Ceci est un email envoyé depuis le site localhost:8000.fr</p>
+        <p class="footer">Ceci est un email envoyé depuis le site Artisan.fr</p>
         </p>
-        <a class="button" href="localhost:8000.fr">Retour au site</a>
+        <a class="button" href="localhost:8000">Retour au site</a>
     </div>
 </body>
 

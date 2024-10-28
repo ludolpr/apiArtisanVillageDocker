@@ -31,9 +31,7 @@ class UserFactory extends Factory
             'picture_user' => 'default_picture' . rand(1, 5) . 'jpg',
             'remember_token' => Str::random(10),
             'id_role' => 1,
-            
         ];
-
 
     }
 

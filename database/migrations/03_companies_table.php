@@ -14,16 +14,16 @@ return new class extends Migration
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
             $table->string('name_company');
-            $table->string('description_company');
+            $table->string('description_company', 255);
             $table->string('picture_company', 255);
             $table->string('zipcode');
             $table->string('phone');
             $table->string('address', 150);
-            $table->bigInteger('siret');
+            $table->unsignedBigInteger('siret');
             $table->string('town', 100);
             $table->string('lat');
             $table->string('long');
-            $table->bigInteger('id_user');
+            $table->unsignedBigInteger('id_user');
             $table->foreign('id_user')
                 ->references('id')
                 ->on('users');

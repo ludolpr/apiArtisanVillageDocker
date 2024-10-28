@@ -35,15 +35,17 @@ class CompanyController extends Controller
  
     public function store(Request $request)
     {
-        $request->validate([
-            'name_company' => 'required|max:50',
-            'description_company' => 'required|max:400',
-            'picture_company' => 'required|image|max:10000',
-            'zipcode' => 'required|max:5',
-            'phone' => 'required|max:50',
-            'address' => 'required|max:150',
-            'siret' => 'required',
-            'town' => 'required|max:50',
+        $validatedData = $request->validate([
+            'name_company' => 'required|string|max:255',
+            'description_company' => 'nullable|string',
+            'zipcode' => 'required|string|max:10',
+            'phone' => 'required|string|max:15',
+            'address' => 'required|string',
+            'siret' => 'required|string|max:14',
+            'town' => 'required|string',
+            'lat' => 'required|numeric',
+            'long' => 'required|numeric',
+            'picture_company' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $filename = "";

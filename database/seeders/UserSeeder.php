@@ -25,6 +25,23 @@ class UserSeeder extends Seeder
             'remember_token' => Str::random(10),
             'id_role' => 3,
         ]);
+        User::create([
+            'name_user' => 'Standard User',
+            'password' => Hash::make('password'),
+            'email' => 'user@example.com',
+            'email_verified_at' => now(),
+            'picture_user' => 'user.jpg',
+            'id_role' => 1,
+        ]);
+
+        User::create([
+            'name_user' => 'Artisan User',
+            'password' => Hash::make('password'),
+            'email' => 'artisan@example.com',
+            'email_verified_at' => now(),
+            'picture_user' => 'user.jpg',
+            'id_role' => 2,
+        ]);
         // Création de 8 utilisateurs aléatoires
         // User::factory(8)->create();
     }

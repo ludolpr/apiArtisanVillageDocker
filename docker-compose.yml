@@ -17,6 +17,7 @@ services:
       - ./docker/.env
     ports:
       - 3306:3306
+    
 
   phpmyadmin:
     image: phpmyadmin:latest

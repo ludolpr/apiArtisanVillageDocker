@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Exécutez les migrations.
      */
     public function up(): void
     {
@@ -17,20 +17,22 @@ return new class extends Migration
             $table->string('picture_product');
             $table->decimal('price', 9, 2);
             $table->string('description_product');
-            $table->bigInteger('id_category');
-            $table->bigInteger('id_company');
+            $table->unsignedBigInteger('id_category');
+            $table->unsignedBigInteger('id_company');
             $table->foreign('id_category')
                 ->references('id')
-                ->on('categories');
+                ->on('categories')
+                ->onDelete('cascade');
             $table->foreign('id_company')
                 ->references('id')
-                ->on('companies');
+                ->on('companies')
+                ->onDelete('cascade');
             $table->timestamps();
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Annulez les migrations.
      */
     public function down(): void
     {
