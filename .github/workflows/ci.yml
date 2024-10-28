@@ -1,5 +1,5 @@
 name: CI-Artisan-village
-# version:1
+# version:1 
 on:
   push:
     branches:
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Copier le fichier .env
+      - name: Copier le fichier .env.docker
         run: |
           echo "DB_CONNECTION=mysql" >> ./docker/.env
           echo "DB_HOST=mysql" >> ./docker/.env
