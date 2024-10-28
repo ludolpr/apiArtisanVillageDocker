@@ -1,8 +1,10 @@
 name: CI-Artisan-village
+
 on:
   push:
   branches:
     - "main"
+
 jobs:
   docker:
     timeout-minutes: 20
