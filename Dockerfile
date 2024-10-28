@@ -19,6 +19,7 @@ COPY docker/.env /var/www/app/.env
 COPY docker/vhost.conf /etc/apache2/sites-available/000-default.conf
 RUN a2enmod rewrite
 RUN chown -R www-data:www-data /var/www/app
+RUN mkdir -p /var/www/app/storage
 RUN chmod -R 775 /var/www/app/storage
 # install composer
 # Configurer la variable d'environnement
