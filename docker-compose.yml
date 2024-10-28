@@ -14,7 +14,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: artisanvillagedocker
     env_file:
-      - ./docker/.env
+      - ./docker/.env.docker
     ports:
       - 3306:3306
     
@@ -26,4 +26,4 @@ services:
     environment:
       PMA_HOST: artisanvillage_db
     env_file:
-      - ./docker/.env
+      - ./docker/.env.docker
