@@ -13,14 +13,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         
-      - name: Copier le fichier .env
+      - name: Copier le fichier .env.docker
         run: |
-          echo "DB_CONNECTION=mysql" >> ./docker/.env
-          echo "DB_HOST=mysql" >> ./docker/.env
-          echo "DB_PORT=3306" >> ./docker/.env
-          echo "DB_DATABASE=testing" >> ./docker/.env
-          echo "DB_USERNAME=root" >> ./docker/.env
-          echo "DB_PASSWORD=root" >> ./docker/.env
+          echo "DB_CONNECTION=mysql" >> ./docker/.env.docker
+          echo "DB_HOST=mysql" >> ./docker/.env.docker
+          echo "DB_PORT=3306" >> ./docker/.env.docker
+          echo "DB_DATABASE=testing" >> ./docker/.env.docker
+          echo "DB_USERNAME=root" >> ./docker/.env.docker
+          echo "DB_PASSWORD=root" >> ./docker/.env.docker
 
       - name: Installer Docker
         uses: hoverkraft-tech/compose-action@v2.0.1
