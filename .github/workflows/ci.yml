@@ -10,7 +10,6 @@ jobs:
     timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
-      
       - name: Deploiement
         if: github.ref == 'refs/heads/main'
         env:
@@ -20,7 +19,7 @@ jobs:
           REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
         run: |
           mkdir -p ~/.ssh
-          echo "${{ SSH_PRIVATE_KEY }} > ~/.ssh/id_rsa
+          echo  ${{ secrets.SSH_PRIVATE_KEY }} > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan $REMOTE_HOST >> ~/.ssh/known_hosts
           rsync -avz --exclude 'node_modules' --exclude '.env' ./ $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
