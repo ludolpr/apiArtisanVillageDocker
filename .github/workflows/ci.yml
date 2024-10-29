@@ -16,15 +16,14 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
+          REMOTE_PATH: /var/www/apiartisanvillage
         run: |
           mkdir -p ~/.ssh
-          echo  ${{ secrets.SSH_PRIVATE_KEY }} > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan $REMOTE_HOST >> ~/.ssh/known_hosts
           rsync -avz --exclude 'node_modules' --exclude '.env' ./ $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
-          ssh $REMOTE_USER@$REMOTE_HOST "
-            mv $REMOTE_PATH &&
+          ssh -o "StrictHostKeyChecking=no" $REMOTE_USER@$REMOTE_HOST "
             cd $REMOTE_PATH &&
             ln -s /etc/nginx/sites-available/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
             composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader &&
