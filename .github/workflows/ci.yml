@@ -1,5 +1,5 @@
 name: CI/CD-Artisan-village
-# eeee
+
 on:
   push:
     branches:
@@ -24,14 +24,14 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H $REMOTE_HOST >> ~/.ssh/known_hosts
 
-          # Test SSH connection (optional for debugging)
-          ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "echo 'SSH Connection Successful'"
+          # Test SSH connection with verbose output
+          ssh -vvv -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "echo 'SSH Connection Successful'"
 
-          # Rsync files to remote server
-          rsync -avz --exclude 'node_modules' --exclude '.env' ./ $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
+          # Rsync files to remote server with verbose output
+          rsync -avz -vvv --exclude 'node_modules' --exclude '.env' ./ $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
 
           # Execute remote deployment commands
-          ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
+          ssh -vvv -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             cd $REMOTE_PATH &&
             ln -sf /etc/nginx/sites-available/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
             composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader &&
@@ -40,5 +40,4 @@ jobs:
             php artisan config:cache &&
             php artisan route:cache &&
             sudo systemctl restart nginx &&
-            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com
-          "
+            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com"
