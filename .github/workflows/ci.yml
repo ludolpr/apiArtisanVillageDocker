@@ -10,29 +10,6 @@ jobs:
     timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Copier le fichier .env.docker
-        run: |
-          echo "DB_CONNECTION=mysql" > ./docker/.env
-          echo "DB_HOST=mysql" >> ./docker/.env
-          echo "DB_PORT=3306" >> ./docker/.env
-          echo "DB_DATABASE=testing" >> ./docker/.env
-          echo "DB_USERNAME=root" >> ./docker/.env
-          echo "DB_PASSWORD=root" >> ./docker/.env
-
-      - name: Installer Docker
-        uses: hoverkraft-tech/compose-action@v2.0.1
-
-      - name: Dormir pendant 30 secondes
-        run: sleep 30s
-        shell: bash
-
-      - name: Initialiser les conteneurs
-        run: |
-          for i in {1..5}; do docker-compose up -d && break || sleep 15; done
-
       - name: Vérifier l'existence des fichiers
         run: |
           [ -f ./docker/.env ] && echo "Fichier .env trouvé." || echo "Fichier .env manquant."
@@ -61,7 +38,7 @@ jobs:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_PATH: /var/www/apiartisanvillage
+          REMOTE_PATH: /var/www/apiartisanvillagee
         run: |
           # Installer sshpass pour l'authentification par mot de passe
           sudo apt-get update && sudo apt-get install -y sshpass
