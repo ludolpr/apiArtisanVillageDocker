@@ -18,13 +18,8 @@ jobs:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_PATH: /var/www/apiartisanvillage
         run: |
-          # Installer sshpass pour l'authentification par mot de passe
           sudo apt-get update && sudo apt-get install -y sshpass
-          # Copier les fichiers nécessaires uniquement
-          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./docker/.env $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/docker/
-          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./src $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/src
-          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./public $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/public
-          # Exécuter les commandes de déploiement à distance
+          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./* $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             cd $REMOTE_PATH &&
             ln -sf /etc/nginx/sites-available/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
