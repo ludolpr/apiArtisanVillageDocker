@@ -24,7 +24,7 @@ jobs:
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             sudo apt-get update &&
             sudo apt-get install -y php-intl &&
-            sudo systemctl restart php8.3-fpm 
+            sudo systemctl restart php8.3-fpm &&
             sudo apt-get install -y composer"
 
   deploy:
@@ -71,4 +71,4 @@ jobs:
             php artisan config:cache &&
             php artisan route:cache &&
             sudo systemctl restart nginx &&
-            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com
+            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com"
