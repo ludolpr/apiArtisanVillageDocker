@@ -24,8 +24,10 @@ jobs:
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             sudo apt-get update &&
             sudo apt-get install -y php-intl &&
-            sudo systemctl restart php8.3-fpm &&
-            sudo apt-get install -y composer"
+            sudo apt-get install -y composer &&
+            echo 'extension=intl.so' | sudo tee -a /etc/php/8.3/fpm/php.ini &&
+            echo 'extension=intl.so' | sudo tee -a /etc/php/8.3/cli/php.ini &&
+            sudo systemctl restart php8.3-fpm"
 
   deploy:
     runs-on: ubuntu-latest
