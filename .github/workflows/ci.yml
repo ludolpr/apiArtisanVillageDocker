@@ -70,13 +70,14 @@ jobs:
           sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./* $REMOTE_USER@$REMOTE_HOST:~/
           # 2. Déplacer les fichiers vers /var/www
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
-            sudo mkdir -p /var/www/apiartisanvillage &&
-            sudo mv ~/docker /var/www/apiartisanvillage &&
-            sudo chown -R $REMOTE_USER:$REMOTE_USER /var/www/apiartisanvillage &&
-            sudo chmod -R 775 /var/www/apiartisanvillage/storage &&
-            sudo chmod -R 775 /var/www/apiartisanvillage/bootstrap/cache &&
+            sudo mkdir -p /var/www/artisanvillage &&
+            sudo mv ~/docker /var/www/artisanvillage &&
+            sudo chown -R $REMOTE_USER:$REMOTE_USER /var/www/artisanvillage &&
+            # Ajustez les permissions
+            sudo chmod -R 775 /var/www/artisanvillage/storage &&
+            sudo chmod -R 775 /var/www/artisanvillage/bootstrap/cache &&
             ln -sf /etc/nginx/sites-available/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
-            cd /var/www/apiartisanvillage &&
+            cd /var/www/artisanvillage &&
             composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader &&
             php artisan migrate --force &&
             php artisan cache:clear &&
@@ -84,4 +85,4 @@ jobs:
             php artisan route:cache &&
             php artisan storage:link &&
             sudo systemctl restart nginx &&
-            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com
+            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com"
