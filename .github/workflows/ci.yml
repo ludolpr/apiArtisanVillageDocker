@@ -17,6 +17,11 @@ jobs:
       - name: Installer sshpass
         run: sudo apt-get update && sudo apt-get install -y sshpass
 
+      - name: Vérification des versions de Composer et PHP
+        run: |
+          composer --version
+          php --version
+
       - name: Déploiement
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
