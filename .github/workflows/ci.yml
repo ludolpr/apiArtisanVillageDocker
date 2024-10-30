@@ -72,7 +72,7 @@ jobs:
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             cd $REMOTE_PATH &&
             sudo chown -R $REMOTE_USER:$REMOTE_USER . &&
-            sudo chmod -R 775 storage bootstrap/cache &&
+            sudo chmod -R 775 storage/ && sudo chmod -R 775 bootstrap/cache
             ln -sf /etc/nginx/sites-available/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
             composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader &&
             php artisan migrate --force &&
