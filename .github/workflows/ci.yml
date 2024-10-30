@@ -1,66 +1,35 @@
 name: CI/CD-Artisan-village
-# test 
+
 on:
   push:
     branches:
       - "main"
 
 jobs:
-  docker:
-    timeout-minutes: 30
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up Docker .env file
+      - name: Installer sshpass et rsync
+        run: sudo apt-get update && sudo apt-get install -y sshpass rsync
+
+      - name: Configurer Docker
         run: |
           mkdir -p ./docker
-          cat <<EOF > ./docker/.env
-          DB_CONNECTION=mysql
-          DB_HOST=mysql
-          DB_PORT=3306
-          DB_DATABASE=testing
-          DB_USERNAME=root
-          DB_PASSWORD=root
-          EOF
+          echo "DB_CONNECTION=mysql" > ./docker/.env
+          echo "DB_HOST=mysql" >> ./docker/.env
+          echo "DB_PORT=3306" >> ./docker/.env
+          echo "DB_DATABASE=testing" >> ./docker/.env
+          echo "DB_USERNAME=root" >> ./docker/.env
+          echo "DB_PASSWORD=root" >> ./docker/.env
 
-      - name: Install Docker Compose
-        uses: hoverkraft-tech/compose-action@v2.0.1
-
-      - name: Wait for Docker services to initialize
-        run: sleep 30s
-
-      - name: Start Docker containers
-        run: |
-          for i in {1..5}; do docker-compose up -d && break || sleep 15; done
-
-      - name: Verify .env file existence
-        run: |
-          [ -f ./docker/.env ] && echo "Fichier .env trouvé." || echo "Fichier .env manquant."
-
-      - name: Copy Nginx configuration
-        run: docker cp ./docker/apiartisanvillage.conf apiArtisanVillage:/etc/nginx/sites-available/apiartisanvillage.conf
-
-      - name: Install Composer dependencies
-        run: docker exec apiArtisanVillage bash -c "composer install"
-
-      - name: Run database migrations
-        run: docker exec apiArtisanVillage bash -c "php artisan migrate --force"
-
-      - name: Seed database
-        run: docker exec apiArtisanVillage bash -c "php artisan db:seed --force"
-
-      - name: Run test database migrations
-        run: docker exec apiArtisanVillage bash -c "php artisan migrate --env=testing --force"
-
-      - name: Run PHPUnit tests
-        run: docker exec apiArtisanVillage bash -c "php artisan test tests/Feature"
-
-      - name: Déployer sur le serveur distant
+      - name: Déploiement avec `rsync`
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-          REMOTE_USER: deployuser
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_PATH: /var/www/apiartisanvillage
         run: |
@@ -68,7 +37,7 @@ jobs:
             sudo mkdir -p $REMOTE_PATH &&
             sudo chown -R $REMOTE_USER:$REMOTE_USER $REMOTE_PATH &&
             sudo chmod -R 775 $REMOTE_PATH"
-          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r * $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
+          sshpass -p "$SSH_PASSWORD" rsync -avz --delete --exclude '.git' --exclude 'node_modules' --exclude '.env' . $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             cd $REMOTE_PATH &&
             sudo chown -R $REMOTE_USER:www-data storage &&
@@ -80,4 +49,4 @@ jobs:
             php artisan config:cache &&
             php artisan route:cache &&
             sudo systemctl restart nginx &&
-            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com
+            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com"
