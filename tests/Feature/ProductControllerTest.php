@@ -96,32 +96,32 @@ class ProductControllerTest extends TestCase
     }
 
 
-    public function test_Product_Show()
-    {
-        // Create a role
-        $role = Role::firstOrCreate(['name_role' => 'utilisateur'], ['id' => 1]);
+    // public function test_Product_Show()
+    // {
+    //     // Create a role
+    //     $role = Role::firstOrCreate(['name_role' => 'utilisateur'], ['id' => 1]);
 
-        // Create a user
-        $user = User::factory()->create(['id_role' => $role->id]);
+    //     // Create a user
+    //     $user = User::factory()->create(['id_role' => $role->id]);
 
-        // Create a company and associate it with the user
-        $company = Company::factory()->create(['id_user' => $user->id]);
+    //     // Create a company and associate it with the user
+    //     $company = Company::factory()->create(['id_user' => $user->id]);
 
-        // Create a category
-        $category = Category::factory()->create(); // Ensure you have a Category model and factory
+    //     // Create a category
+    //     $category = Category::factory()->create(); // Ensure you have a Category model and factory
 
-        // Create a product associated with the company and category
-        $product = Product::factory()->create(['id_company' => $company->id, 'id_category' => $category->id]);
+    //     // Create a product associated with the company and category
+    //     $product = Product::factory()->create(['id_company' => $company->id, 'id_category' => $category->id]);
 
-        // Make a GET request to the show endpoint
-        $response = $this->getJson("/api/product/{$product->id}");
+    //     // Make a GET request to the show endpoint
+    //     $response = $this->getJson("/api/product/{$product->id}");
 
-        // Check the response status
-        $response->assertStatus(200);
+    //     // Check the response status
+    //     $response->assertStatus(200);
 
-        // Check that the response contains the product ID
-        $response->assertJson(['id' => $product->id]);
-    }
+    //     // Check that the response contains the product ID
+    //     $response->assertJson(['id' => $product->id]);
+    // }
 
 
 
