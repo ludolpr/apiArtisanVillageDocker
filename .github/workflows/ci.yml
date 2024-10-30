@@ -72,10 +72,10 @@ jobs:
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             sudo mkdir -p /var/www/artisanvillage &&
             sudo mv ~/docker /var/www/artisanvillage &&
-            sudo chown -R $REMOTE_USER:$REMOTE_USER /var/www/artisanvillage &&
             # Ajustez les permissions
+            sudo chown -R www-data:www-data /var/www/artisanvillage/storage &&
             sudo chmod -R 775 /var/www/artisanvillage/storage &&
-            sudo chmod -R 775 /var/www/artisanvillage/bootstrap/cache &&
+            sudo chown -R $REMOTE_USER:$REMOTE_USER /var/www/artisanvillage &&
             ln -sf /etc/nginx/sites-available/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
             cd /var/www/artisanvillage &&
             composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader &&
