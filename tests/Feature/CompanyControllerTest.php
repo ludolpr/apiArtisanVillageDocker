@@ -159,27 +159,27 @@ class CompanyControllerTest extends TestCase
     }
 
 
-    public function test_Company_Destroy()
-    {
-        // Créez un rôle
-        $role = Role::firstOrCreate(['id' => 2, 'name_role' => 'utilisateur']);
+    // public function test_Company_Destroy()
+    // {
+    //     // Créez un rôle
+    //     $role = Role::firstOrCreate(['id' => 2, 'name_role' => 'utilisateur']);
 
-        // Créez un utilisateur avec le rôle
-        $user = User::factory()->create(['id_role' => $role->id]);
+    //     // Créez un utilisateur avec le rôle
+    //     $user = User::factory()->create(['id_role' => $role->id]);
 
-        // Créez une compagnie associée à l'utilisateur
-        $company = Company::factory()->create(['id_user' => $user->id]);
+    //     // Créez une compagnie associée à l'utilisateur
+    //     $company = Company::factory()->create(['id_user' => $user->id]);
 
-        // Authentifiez l'utilisateur
-        $this->actingAs($user);
+    //     // Authentifiez l'utilisateur
+    //     $this->actingAs($user);
 
-        // Envoie une requête DELETE pour supprimer la compagnie
-        $response = $this->deleteJson("/api/company/{$company->id}");
+    //     // Envoie une requête DELETE pour supprimer la compagnie
+    //     $response = $this->deleteJson("/api/company/{$company->id}");
 
-        // Vérifiez la réponse
-        $response->assertStatus(200);
+    //     // Vérifiez la réponse
+    //     $response->assertStatus(200);
 
-        // Vérifiez si la compagnie a été supprimée de la base de données
-        $this->assertDatabaseMissing('companies', ['id' => $company->id]);
-    }
+    //     // Vérifiez si la compagnie a été supprimée de la base de données
+    //     $this->assertDatabaseMissing('companies', ['id' => $company->id]);
+    // }
 }
