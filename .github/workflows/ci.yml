@@ -39,7 +39,7 @@ jobs:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_PATH: /var/www/apiartisanvillage
+          REMOTE_PATH: /var/www/apiartisanvillageludolpr
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             sudo mkdir -p $REMOTE_PATH &&
@@ -58,10 +58,11 @@ jobs:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_PATH: /var/www/apiartisanvillage
+          REMOTE_PATH: /var/www/apiartisanvillageludolpr
+          FINAL_PATH: /var/www/apiartisanvillage
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
-            sudo ln -sf $REMOTE_PATH/docker/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
+            sudo ln -sf $REMOTE_PATH/docker/apiartisanvillageludolpr.conf /etc/nginx/sites-enabled/ &&
             cd $REMOTE_PATH &&
             sudo chown -R $REMOTE_USER:www-data storage bootstrap/cache &&
             sudo chmod -R 775 storage bootstrap/cache &&
@@ -71,4 +72,8 @@ jobs:
             php artisan config:cache &&
             php artisan route:cache &&
             sudo systemctl restart nginx &&
-            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com"
+            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com &&
+
+            # Move the contents to the final directory
+            sudo mv $REMOTE_PATH/* $FINAL_PATH/ &&
+            sudo chown -R $REMOTE_USER:www-data $FINAL_PATH"
