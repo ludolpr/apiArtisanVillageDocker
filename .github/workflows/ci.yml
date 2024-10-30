@@ -12,21 +12,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Installer sshpass
-        run: sudo apt-get update && sudo apt-get install -y sshpass
+      - name: Installer sshpass et rsync
+        run: sudo apt-get update && sudo apt-get install -y sshpass rsync
 
       - name: Déployer les fichiers sur le serveur
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_PATH: /home/${{ secrets.REMOTE_USER }}/apiartisanvillage
+          REMOTE_TEMP_PATH: /home/${{ secrets.REMOTE_USER }}/apiartisanvillage
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
-            mkdir -p $REMOTE_PATH"
-          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r * $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
+            mkdir -p $REMOTE_TEMP_PATH"
+          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r * $REMOTE_USER@$REMOTE_HOST:$REMOTE_TEMP_PATH
 
-      - name: Déplacer les fichiers vers le répertoire souhaité
+      - name: Déplacer et synchroniser les fichiers vers le répertoire souhaité
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
@@ -35,7 +35,7 @@ jobs:
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             sudo mkdir -p $REMOTE_PATH &&
-            sudo mv ~/apiartisanvillage/* $REMOTE_PATH &&
+            sudo rsync -avz --ignore-existing ~/apiartisanvillage/ $REMOTE_PATH &&
             sudo chown -R $REMOTE_USER:$REMOTE_USER $REMOTE_PATH &&
             sudo chmod -R 775 $REMOTE_PATH &&
             sudo chown -R www-data:www-data $REMOTE_PATH/storage $REMOTE_PATH/bootstrap/cache"
