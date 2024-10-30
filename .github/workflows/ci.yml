@@ -17,11 +17,6 @@ jobs:
       - name: Installer sshpass
         run: sudo apt-get update && sudo apt-get install -y sshpass
 
-      - name: Vérification des versions de Composer et PHP
-        run: |
-          composer --version
-          php --version
-
       - name: Déploiement
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
@@ -44,7 +39,7 @@ jobs:
             cd $REMOTE_PATH &&
             sudo chown -R $REMOTE_USER:www-data storage bootstrap/cache &&
             sudo chmod -R 775 storage bootstrap/cache &&
-            composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader &&
+            composer update --no-dev --no-interaction --prefer-dist --optimize-autoloader &&
             php artisan migrate --force &&
             php artisan cache:clear &&
             php artisan config:cache &&
