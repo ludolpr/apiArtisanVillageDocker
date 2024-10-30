@@ -62,18 +62,20 @@ jobs:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
+          REMOTE_PATH: /var/www/apiartisanvillage
         run: |
           sudo apt-get update && sudo apt-get install -y sshpass
           # Créer les répertoires nécessaires sur le serveur distant et ajuster les permissions
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "sudo mkdir -p $REMOTE_PATH && sudo chown -R $REMOTE_USER:$REMOTE_USER $REMOTE_PATH"
           # Copier les fichiers nécessaires
-          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r * $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/
+          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r . $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/
           # Exécuter les commandes de déploiement à distance avec des permissions appropriées
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             cd $REMOTE_PATH &&
-            sudo chown -R $REMOTE_USER:$REMOTE_USER . &&
+            sudo chown -R $REMOTE_USER:www-data storage &&
             sudo chmod -R 775 storage &&
+            sudo find storage -type d -exec chmod 775 {} \; &&
+            sudo find storage -type f -exec chmod 664 {} \; &&
             ln -sf /etc/nginx/sites-available/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
             composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader &&
             php artisan migrate --force &&
@@ -81,4 +83,4 @@ jobs:
             php artisan config:cache &&
             php artisan route:cache &&
             sudo systemctl restart nginx &&
-            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com
+            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive
