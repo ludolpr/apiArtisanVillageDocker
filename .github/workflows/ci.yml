@@ -57,7 +57,7 @@ jobs:
       - name: Run PHPUnit tests
         run: docker exec apiArtisanVillage bash -c "php artisan test tests/Feature"
 
-      - name: Deployment to production
+      - name: Deploiement
         if: github.ref == 'refs/heads/main'
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
