@@ -65,8 +65,11 @@ jobs:
           REMOTE_PATH: /var/www/apiartisanvillage
         run: |
           sudo apt-get update && sudo apt-get install -y sshpass
-          # Créer les répertoires nécessaires sur le serveur distant
-          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "mkdir -p $REMOTE_PATH/docker"
+          # Créer les répertoires nécessaires sur le serveur distant et définir les permissions
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
+            mkdir -p $REMOTE_PATH/docker &&
+            mkdir -p $REMOTE_PATH/storage &&
+            chmod -R 775 $REMOTE_PATH/storage"
           # Copier les fichiers nécessaires
           sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r docker/.env $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/docker/
           sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./* $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/
@@ -80,4 +83,4 @@ jobs:
             php artisan config:cache &&
             php artisan route:cache &&
             sudo systemctl restart nginx &&
-            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com"
+            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com
