@@ -27,6 +27,8 @@ jobs:
           # Créer les répertoires nécessaires sur le serveur distant et ajuster les permissions
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             sudo mkdir -p $REMOTE_PATH &&
+            sudo mkdir -p $REMOTE_PATH/storage &&
+            sudo mkdir -p $REMOTE_PATH/bootstrap/cache &&
             sudo chown -R $REMOTE_USER:$REMOTE_USER $REMOTE_PATH &&
             sudo chmod -R 775 $REMOTE_PATH"
           # Copier les fichiers nécessaires
@@ -34,9 +36,9 @@ jobs:
           # Exécuter les commandes de déploiement à distance avec des permissions appropriées
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             cd $REMOTE_PATH &&
-            sudo chown -R $REMOTE_USER:www-data storage &&
-            sudo chmod -R 775 storage &&
-            sudo chmod -R 775 bootstrap/cache &&
+            sudo chown -R $REMOTE_USER:www-data storage bootstrap/cache &&
+            sudo chmod -R 775 storage bootstrap/cache &&
+            ln -sf /etc/nginx/sites-available/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
             composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader &&
             php artisan migrate --force &&
             php artisan cache:clear &&
