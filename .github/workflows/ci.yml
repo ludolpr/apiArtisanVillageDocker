@@ -57,32 +57,27 @@ jobs:
       - name: Run PHPUnit tests
         run: docker exec apiArtisanVillage bash -c "php artisan test tests/Feature"
 
-      - name: Deploiement
-        if: github.ref == 'refs/heads/main'
+      - name: Déployer sur le serveur distant
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_USER: deployuser
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
+          REMOTE_PATH: /var/www/apiartisanvillage
         run: |
-          sudo apt-get update && sudo apt-get install -y sshpass
-          # 1. Transférer les fichiers vers la racine du VPS
-          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./* $REMOTE_USER@$REMOTE_HOST:~/
-          # 2. Déplacer les fichiers vers /var/www
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
-            sudo mkdir -p /var/www/artisanvillage &&
-            sudo mv ~/docker /var/www/artisanvillage &&
-            # Ajustez les permissions
-            sudo chown -R www-data:www-data /var/www/artisanvillage/storage &&
-            sudo chmod -R 775 /var/www/artisanvillage/storage &&
-            sudo chown -R $REMOTE_USER:$REMOTE_USER /var/www/artisanvillage &&
+            sudo mkdir -p $REMOTE_PATH &&
+            sudo chown -R $REMOTE_USER:$REMOTE_USER $REMOTE_PATH &&
+            sudo chmod -R 775 $REMOTE_PATH"
+          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r * $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
+            cd $REMOTE_PATH &&
+            sudo chown -R $REMOTE_USER:www-data storage &&
+            sudo chmod -R 775 storage &&
             ln -sf /etc/nginx/sites-available/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
-            cd /var/www/artisanvillage &&
             composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader &&
             php artisan migrate --force &&
             php artisan cache:clear &&
             php artisan config:cache &&
             php artisan route:cache &&
-            php artisan storage:link &&
             sudo systemctl restart nginx &&
-            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com"
+            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com
