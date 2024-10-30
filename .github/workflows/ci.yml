@@ -24,11 +24,12 @@ jobs:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_PATH: /var/www/apiartisanvillage
         run: |
-          # Installer l'extension intl sur le serveur distant
+          # Installer l'extension intl et Composer sur le serveur distant
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             sudo apt-get update &&
             sudo apt-get install -y php-intl &&
-            sudo systemctl restart nginx"
+            sudo systemctl restart nginx &&
+            composer --version || sudo apt-get install -y composer"
           # Créer les répertoires nécessaires sur le serveur distant et ajuster les permissions
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             sudo mkdir -p $REMOTE_PATH &&
