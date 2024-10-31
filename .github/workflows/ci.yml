@@ -9,7 +9,6 @@ jobs:
   setup:
   post-deploy:
     runs-on: ubuntu-latest
-    needs: deploy
     steps:
       - name: Finaliser le déploiement
         env:
