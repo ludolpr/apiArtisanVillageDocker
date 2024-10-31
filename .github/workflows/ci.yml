@@ -76,10 +76,13 @@ jobs:
             # Déplacer le fichier de configuration Nginx
             sudo cp $REMOTE_PATH/docker/apiartisanvillage.conf /etc/nginx/sites-available/ &&
             sudo ln -sf /etc/nginx/sites-available/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
+            # Assurer les permissions des répertoires de logs et de cache
+            sudo chmod -R 775 $REMOTE_PATH/storage/logs &&
+            sudo chown -R www-data:www-data $REMOTE_PATH/storage/logs &&
+            sudo chmod -R 775 $REMOTE_PATH/bootstrap/cache &&
+            sudo chown -R www-data:www-data $REMOTE_PATH/bootstrap/cache &&
             # Installation des dépendances Composer et exécution des commandes Laravel
             cd $REMOTE_PATH &&
-            sudo chmod -R 775 storage bootstrap/cache &&
-            sudo chown -R www-data storage bootstrap/cache &&
             composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader &&
             php artisan migrate --force &&
             php artisan cache:clear &&
