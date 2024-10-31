@@ -41,11 +41,10 @@ jobs:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_TEMP_PATH: ${{ secrets.REMOTE_TEMP_PATH }}
         run: |
-          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
-            mkdir -p $REMOTE_TEMP_PATH"
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "mkdir -p $REMOTE_TEMP_PATH"
           sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r * $REMOTE_USER@$REMOTE_HOST:$REMOTE_TEMP_PATH
 
-      - name: Déplacer et synchroniser les fichiers vers le répertoire souhaité
+      - name: Déployer le code et ajuster les permissions
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
@@ -74,16 +73,19 @@ jobs:
           FINAL_PATH: /var/www/apiartisanvillage
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
-            sudo ln -sf $REMOTE_PATH/docker/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
-            cd $REMOTE_PATH &&
-            sudo chown -R $REMOTE_USER:www-data storage bootstrap/cache &&
-            sudo chmod -R 775 storage bootstrap/cache &&
+            # Déplacer le contenu vers le répertoire final
             sudo mv $REMOTE_PATH/* $FINAL_PATH/ &&
             sudo chown -R $REMOTE_USER:www-data $FINAL_PATH &&
+            # Configuration Nginx
+            sudo ln -sf $FINAL_PATH/docker/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
+            cd $FINAL_PATH &&
+            # Installation des dépendances Composer et exécution des commandes Laravel
             composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader &&
             php artisan migrate --force &&
             php artisan cache:clear &&
             php artisan config:cache &&
             php artisan route:cache &&
+            # Redémarrage Nginx
             sudo systemctl restart nginx &&
+            # Configuration SSL avec Certbot
             sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com"
