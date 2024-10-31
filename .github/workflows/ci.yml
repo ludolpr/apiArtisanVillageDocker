@@ -69,17 +69,14 @@ jobs:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_PATH: /var/www/apiartisanvillageludolpr
-          FINAL_PATH: /var/www/apiartisanvillage
+          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
-            # Déplacer le contenu vers le répertoire final
-            sudo mv $REMOTE_PATH/* $FINAL_PATH/ &&
-            sudo chown -R $REMOTE_USER:www-data $FINAL_PATH &&
-            # Configuration Nginx
-            sudo ln -sf $FINAL_PATH/docker/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
-            cd $FINAL_PATH &&
+            # Déplacer le fichier de configuration Nginx
+            sudo cp $REMOTE_PATH/docker/apiartisanvillage.conf /etc/nginx/sites-available/ &&
+            sudo ln -sf /etc/nginx/sites-available/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
             # Installation des dépendances Composer et exécution des commandes Laravel
+            cd $REMOTE_PATH &&
             composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader &&
             php artisan migrate --force &&
             php artisan cache:clear &&
