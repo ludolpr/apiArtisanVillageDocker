@@ -74,8 +74,8 @@ jobs:
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking-no $REMOTE_USER@$REMOTE_HOST "
             # Déplacer le fichier de configuration Nginx
-            sudo cp $REMOTE_PATH/docker/apiartisanvillage.conf /etc/nginx/sites-available/ &&
-            sudo ln -sf /etc/nginx/sites-available/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
+            sudo cp $REMOTE_PATH/docker/apiartisanvillage /etc/nginx/sites-available/ &&
+            sudo ln -sf /etc/nginx/sites-available/apiartisanvillage /etc/nginx/sites-enabled/ &&
             # Installation des dépendances Composer et exécution des commandes Laravel
             cd $REMOTE_PATH &&
             sudo chmod -R 775 storage bootstrap/cache &&
