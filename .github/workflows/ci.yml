@@ -12,10 +12,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install sshpass
+      - name: Installer sshpass
         run: sudo apt-get update && sudo apt-get install -y sshpass
 
-      - name: Install Composer on server
+      - name: Installer intl et Composer sur le serveur
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
@@ -24,6 +24,7 @@ jobs:
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             sudo apt-get update &&
             sudo apt-get install -y php-intl &&
+            sudo systemctl restart php8.3-fpm &&
             sudo apt-get install -y composer"
 
   deploy:
@@ -33,7 +34,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Deploy files to the server
+      - name: Déployer les fichiers sur le serveur
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
@@ -43,7 +44,7 @@ jobs:
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "mkdir -p $REMOTE_TEMP_PATH"
           sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r * $REMOTE_USER@$REMOTE_HOST:$REMOTE_TEMP_PATH
 
-      - name: Deploy code and adjust permissions
+      - name: Déployer le code et ajuster les permissions
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
@@ -58,37 +59,31 @@ jobs:
             sudo chown -R $REMOTE_USER:$REMOTE_USER $REMOTE_PATH &&
             sudo chmod -R 775 $REMOTE_PATH &&
             sudo chown -R www-data:www-data $REMOTE_PATH/storage $REMOTE_PATH/bootstrap/cache &&
-            # Ensure directories are writable
             sudo chmod -R 775 $REMOTE_PATH/storage $REMOTE_PATH/bootstrap/cache"
 
   post-deploy:
-  runs-on: ubuntu-latest
-  needs: deploy
-  steps:
-    - name: Finalize deployment
-      env:
-        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-        REMOTE_USER: ${{ secrets.REMOTE_USER }}
-        REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-        REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
-      run: |
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
-          # Set permissions
-          sudo chown -R $REMOTE_USER:www-data $REMOTE_PATH/storage $REMOTE_PATH/bootstrap/cache &&
-          sudo chmod -R 775 $REMOTE_PATH/storage $REMOTE_PATH/bootstrap/cache &&
-
-          # Move the Nginx configuration file
-          sudo cp $REMOTE_PATH/docker/apiartisanvillage /etc/nginx/sites-available/ &&
-          sudo ln -sf /etc/nginx/sites-available/apiartisanvillage /etc/nginx/sites-enabled/ &&
-          # Install Composer dependencies and run Laravel commands
-          cd $REMOTE_PATH &&
-          composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader &&
-          php artisan migrate --force &&
-          php artisan cache:clear &&
-          php artisan config:cache &&
-          php artisan route:cache &&
-          # Restart Nginx
-          sudo systemctl restart nginx &&
-          # SSL configuration with Certbot
-          sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com"
-
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Finaliser le déploiement
+        env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
+        run: |
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
+            # Déplacer le fichier de configuration Nginx
+            sudo cp $REMOTE_PATH/docker/apiartisanvillage.conf /etc/nginx/sites-available/ &&
+            sudo ln -sf /etc/nginx/sites-available/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
+            # Installation des dépendances Composer et exécution des commandes Laravel
+            cd $REMOTE_PATH &&
+            composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader &&
+            php artisan migrate --force &&
+            php artisan cache:clear &&
+            php artisan config:cache &&
+            php artisan route:cache &&
+            # Redémarrage Nginx
+            sudo systemctl restart nginx &&
+            # Configuration SSL avec Certbot
+            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com"
