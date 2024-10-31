@@ -20,7 +20,7 @@ jobs:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_TEMP_PATH: /home/${{ secrets.REMOTE_USER }}/apiartisanvillage
+          REMOTE_TEMP_PATH: ${{ secrets.REMOTE_TEMP_PATH }}
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             mkdir -p $REMOTE_TEMP_PATH"
@@ -31,7 +31,7 @@ jobs:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_PATH: /var/www/apiartisanvillage
+          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             sudo mkdir -p $REMOTE_PATH &&
