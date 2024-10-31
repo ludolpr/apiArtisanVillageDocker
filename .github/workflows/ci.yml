@@ -35,6 +35,8 @@ jobs:
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             sudo mkdir -p $REMOTE_PATH &&
+            sudo mkdir -p $REMOTE_PATH/storage &&
+            sudo mkdir -p $REMOTE_PATH/bootstrap/cache &&
             sudo rsync -avz --ignore-existing ~/apiartisanvillage/ $REMOTE_PATH &&
             sudo chown -R $REMOTE_USER:$REMOTE_USER $REMOTE_PATH &&
             sudo chmod -R 775 $REMOTE_PATH &&
