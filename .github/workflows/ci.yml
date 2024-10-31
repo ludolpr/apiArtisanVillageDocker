@@ -55,7 +55,7 @@ jobs:
             sudo mkdir -p $REMOTE_PATH &&
             sudo mkdir -p $REMOTE_PATH/storage &&
             sudo mkdir -p $REMOTE_PATH/bootstrap/cache &&
-            sudo rsync -avz --ignore-existing $REMOTE_TEMP_PATH/ $REMOTE_PATH &&
+            sudo rsync -avz --ignore-existing ~/apiartisanvillage/ $REMOTE_PATH &&
             sudo chown -R $REMOTE_USER:$REMOTE_USER $REMOTE_PATH &&
             sudo chmod -R 775 $REMOTE_PATH &&
             sudo chown -R www-data:www-data $REMOTE_PATH/storage $REMOTE_PATH/bootstrap/cache &&
@@ -74,16 +74,6 @@ jobs:
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             # Déplacer le fichier de configuration Nginx
-            sudo cp $REMOTE_PATH/docker/apiartisanvillage.conf /etc/nginx/sites-available/ &&
-            sudo ln -sf /etc/nginx/sites-available/apiartisanvillage.conf /etc/nginx/sites-enabled/ &&
-            # Installation des dépendances Composer et exécution des commandes Laravel
-            cd $REMOTE_PATH &&
-            composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader &&
-            php artisan migrate --force &&
-            php artisan cache:clear &&
-            php artisan config:cache &&
-            php artisan route:cache &&
-            # Redémarrage de Nginx
-            sudo systemctl restart nginx &&
-            # Configuration SSL avec Certbot
-            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com"
+            sudo cp $REMOTE_PATH/docker/apiartisanvillage /etc/nginx/sites-available/ &&
+            sudo ln -sf /etc/nginx/sites-available/apiartisanvillage /etc/nginx/sites-enabled/"
+            
