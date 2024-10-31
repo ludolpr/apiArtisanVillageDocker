@@ -15,7 +15,7 @@ jobs:
       - name: Installer sshpass
         run: sudo apt-get update && sudo apt-get install -y sshpass
 
-      - name: Installer intl et Composer sur le serveur
+      - name: Installer Composer sur le serveur
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
@@ -24,10 +24,6 @@ jobs:
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
             sudo apt-get update &&
             sudo apt-get install -y php-intl &&
-            # Activation de l'extension intl pour CLI et FPM en PHP 8.3
-            echo 'extension=intl.so' | sudo tee -a /etc/php/8.3/cli/php.ini &&
-            echo 'extension=intl.so' | sudo tee -a /etc/php/8.3/fpm/php.ini &&
-            sudo systemctl restart php8.3-fpm &&
             sudo apt-get install -y composer"
 
   deploy:
