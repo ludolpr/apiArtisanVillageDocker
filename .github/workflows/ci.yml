@@ -39,15 +39,17 @@ jobs:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_PATH: /var/www/apiartisanvillageludolpr
+          REMOTE_TEMP_PATH: ${{ secrets.REMOTE_TEMP_PATH }}
+          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
+            sudo mkdir -p $REMOTE_TEMP_PATH &&
             sudo mkdir -p $REMOTE_PATH &&
             sudo mkdir -p $REMOTE_PATH/storage &&
             sudo mkdir -p $REMOTE_PATH/bootstrap/cache &&
             sudo chown -R $REMOTE_USER:$REMOTE_USER $REMOTE_PATH &&
             sudo chmod -R 775 $REMOTE_PATH"
-          sshpass -p "$SSH_PASSWORD" rsync -avz --exclude '.git' --exclude 'node_modules' --exclude '.env' . $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
+          sshpass -p "$SSH_PASSWORD" rsync -avz --ignore-existing $REMOTE_TEMP_PATH/ $REMOTE_PATH
 
   post-deploy:
     runs-on: ubuntu-latest
