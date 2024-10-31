@@ -66,13 +66,13 @@ jobs:
             cd $REMOTE_PATH &&
             sudo chown -R $REMOTE_USER:www-data storage bootstrap/cache &&
             sudo chmod -R 775 storage bootstrap/cache &&
+            # Déplacer le contenu vers le répertoire final
+            sudo mv $REMOTE_PATH/* $FINAL_PATH/ &&
+            sudo chown -R $REMOTE_USER:www-data $FINAL_PATH &&
             composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader &&
             php artisan migrate --force &&
             php artisan cache:clear &&
             php artisan config:cache &&
             php artisan route:cache &&
             sudo systemctl restart nginx &&
-            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com &&
-            # Déplacer le contenu vers le répertoire final
-            sudo mv $REMOTE_PATH/* $FINAL_PATH/ &&
-            sudo chown -R $REMOTE_USER:www-data $FINAL_PATH"
+            sudo certbot --nginx -d artisanvillage.fr -d www.artisanvillage.fr --non-interactive --agree-tos -m ludolpr@gmail.com"
