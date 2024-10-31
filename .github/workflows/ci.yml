@@ -34,16 +34,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Déployer les fichiers sur le serveur
+        env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_TEMP_PATH: /home/${{ secrets.REMOTE_USER }}/apiartisanvillage
+        run: |
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
+            mkdir -p $REMOTE_TEMP_PATH"
+          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r * $REMOTE_USER@$REMOTE_HOST:$REMOTE_TEMP_PATH
+
       - name: Déployer le code et ajuster les permissions
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_TEMP_PATH: ${{ secrets.REMOTE_TEMP_PATH }}
-          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
+          REMOTE_PATH: /var/www/apiartisanvillageludolpr
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "
-            sudo mkdir -p $REMOTE_TEMP_PATH &&
             sudo mkdir -p $REMOTE_PATH &&
             sudo mkdir -p $REMOTE_PATH/storage &&
             sudo mkdir -p $REMOTE_PATH/bootstrap/cache &&
